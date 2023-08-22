@@ -3,20 +3,26 @@ import './LoginSignup.css'; // CSS 파일을 import
 import Login from '../components/Login';
 import Signup from '../components/Signup';
 // import { useForm } from 'react-hook-form';
-// import axios from 'axios';
 
 const LoginSignup = () => {
   const [isSignupActive, setIsSignupActive] = useState(false);
 
-  const handleClick = () => {
-    setIsSignupActive(!isSignupActive);
+  // const handleClick = () => {
+  //   setIsSignupActive(!isSignupActive);
+  // };
+
+  const handleSwitchToSignup = () => {
+    setIsSignupActive(true);
   };
 
   return (
     <div>
-      <button onClick={handleClick}>
-        {isSignupActive ? <Signup /> : <Login />}
-      </button>
+      {/* <button onClick={handleClick}> */}
+      {isSignupActive ? <Signup /> : <Login />}
+      <div>
+        <button onClick={handleSwitchToSignup}>회원가입</button>
+      </div>
+      {/* </button> */}
     </div>
   );
 };

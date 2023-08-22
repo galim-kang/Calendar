@@ -443,17 +443,25 @@ export default function TUICalendar({
       isPrivate: eventData.isPrivate,
     };
 
+    console.log(eventData.start);
     try {
+      // const eventForBack = await instance.post('/api/v1/schedules/', {
+      //   title: eventData.title,
+      //   description: eventData.location,
+      //   state: eventData.state === 'Busy' ? 'To do' : 'Done',
+      //   start_date: eventData.start,
+      //   end_date: eventData.end,
+      //   // team: eventData.calendarId,
+      // });
+
       const eventForBack = await instance.post('/api/v1/schedules/', {
-        title: eventData.title,
-        description: eventData.location,
-        state: eventData.state,
-        start_date: eventData.start,
-        end_date: eventData.end,
-        user: eventData.user,
-        team: eventData.calendarId,
+        title: 'eventData.title',
+        description: 'eventData.location',
+        state: 'To do',
+        start_date: 20230101,
+        end_date: 20230102,
+        // team: eventData.calendarId,
       });
-      // axios.post('url', eventForBack);
 
       console.log('일정 생성 API 응답', eventForBack.data);
       setEventCounter(eventCounter + 1);

@@ -1,14 +1,29 @@
+import React from 'react';
 import { useForm } from 'react-hook-form';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // useNavigate를 import
+import { loginApi } from '../api';
 
 const Login = () => {
+  const navigate = useNavigate(); // useNavigate를 가져옴
+
+  // 로그인 폼 제출 시 실행되는 함수
   const onSubmit = async (data) => {
+    // 서버로 로그인 요청을 보냅니다.
     try {
-      const response = await axios.post(
-        'https://port-0-calendar-backend-ac2nll4pdsc1.sel3.cloudtype.app/api/v1/users/login/',
-        data,
-      ); // 서버로 로그인 요청 보내기
+      // loginApi 함수 사용하여 로그인 요청 보내기
+      const response = await loginApi({
+        username: data.id,
+        password: data.password,
+      });
+      // const response = await axios.post(
+      //   'https://port-0-calendar-backend-ac2nll4pdsc1.sel3.cloudtype.app/api/v1/users/login/',
+      //   data,
+      // );
       console.log(response.data); // 서버 응답 데이터 출력
+      // 로그인 성공 시 홈 화면으로 이동
+      if (response.status === 200) {
+        navigate('/', { replace: true });
+      }
     } catch (error) {
       console.error('로그인 실패:', error);
     }

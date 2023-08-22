@@ -1,21 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { signupApi, checkIdAvailabilityApi } from '../api'; // api.js에서 정의한 함수 임포트
 
 const Signup = () => {
+  const navigate = useNavigate();
+  // 회원가입 폼 제출 시 실행되는 함수
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post(
-        'https://port-0-calendar-backend-ac2nll4pdsc1.sel3.cloudtype.app/api/v1/users/signup/',
-        {
-          username: data.id,
-          name: data.name,
-          password: data.password,
-          email: data.email,
-        },
-      );
+      // signupApi 함수 사용하여 회원가입 요청 보내기
+      const response = await signupApi({
+        username: data.id,
+        name: data.name,
+        password: data.password,
+        email: data.email,
+      });
+      // const response = await axios.post(
+      //   'https://port-0-calendar-backend-ac2nll4pdsc1.sel3.cloudtype.app/api/v1/users/signup/',
+      //   {
+      //     username: data.id,
+      //     name: data.name,
+      //     password: data.password,
+      //     email: data.email,
+      //   },
+      // );
       console.log(response.data);
+      // 회원가입 성공 시 홈 화면으로 이동
+      if (response.status === 201) {
+        navigate('/', { replace: true });
+      }
     } catch (error) {
       console.error('회원가입 실패:', error);
     }
@@ -23,6 +36,7 @@ const Signup = () => {
 
   const [isIdAvailable, setIsIdAvailable] = useState(true);
 
+  // react-hook-form을 사용하여 폼 상태와 입력을 관리합니다.
   const {
     register,
     handleSubmit,
@@ -30,16 +44,22 @@ const Signup = () => {
     getValues,
   } = useForm();
 
+  // 아이디 중복 확인 요청 함수
   const checkIdAvailability = async () => {
     const id = getValues('id');
 
+    // 아이디 중복 확인을 위한 서버 요청을 보냅니다.
     try {
-      const response = await axios.post(
-        'https://port-0-calendar-backend-ac2nll4pdsc1.sel3.cloudtype.app/api/v1/users/idcheck/',
-        {
-          username: id,
-        },
-      );
+      // checkIdAvailabilityApi 함수 사용하여 아이디 중복 확인 요청 보내기
+      const response = await checkIdAvailabilityApi({ username: id });
+      // const response = await axios.post(
+      //   'https://port-0-calendar-backend-ac2nll4pdsc1.sel3.cloudtype.app/api/v1/users/idcheck/',
+      //   {
+      //     username: id,
+      //   },
+      // );
+      // 중복 여부에 따라 상태를 업데이트합니다.
+      setIsIdAvailable(response.data.isAvailable);
     } catch (error) {
       console.error('중복확인 실패:', error);
     }

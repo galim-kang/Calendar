@@ -6,3 +6,18 @@ const instance = axios.create({
 });
 
 export default instance;
+
+// 로그인 API 함수
+export const loginApi = (data) => {
+  return instance.post('/api/v1/users/login/', data);
+};
+
+// 회원가입 API 함수
+export const signupApi = (data) => {
+  return instance.post('/api/v1/users/signup/', data);
+};
+
+// 아이디 중복 확인 API 함수
+export const checkIdAvailabilityApi = (data) => {
+  return instance.post('/api/v1/users/idcheck/', data);
+};
