@@ -1,6 +1,8 @@
 import { styled } from 'styled-components';
 import ColorPicker from './ColorPicker';
 import { useState } from 'react';
+import { createTeamApi, nicknameCheckApi } from '../../api';
+
 const TeamAddContainer = styled.div`
   width: 100%;
   height: 36%;
@@ -105,14 +107,25 @@ const ATMbutton = styled.button`
   }
 `;
 function TeamAddModal() {
+  const [nicknameValid, setNicknameValid] = useState(false);
   const [teamAddModalIsOpen, setTeamAddModalIsOpen] = useState(false);
   const [teamname, setTeamname] = useState('');
   const [nickname, setNickname] = useState('');
   const [selectedColor, setSelectedColor] = useState('#F44E3B');
 
   // 폼 제출 핸들러
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+
+    try {
+      const response = await createTeamApi({
+        teamname: teamname,
+        color: selectedColor,
+      });
+      console.log('팀 생성 성공:', response.data);
+    } catch (error) {
+      console.error('팀 생성 실패:', error);
+    }
 
     // 폼 입력을 콘솔에 기록
     console.log('팀 이름:', teamname);
@@ -120,6 +133,23 @@ function TeamAddModal() {
     console.log('선택한 색상:', selectedColor);
     setTeamAddModalIsOpen(false);
   };
+
+  // 닉네임 중복 검사 핸들러
+  const handleNicknameCheck = async () => {
+    try {
+      const response = await nicknameCheckApi(teamname, nickname);
+      // 중복되지 않으면 상태를 변경
+      if (response.data.available) {
+        setNicknameValid(true);
+      } else {
+        alert('중복된 닉네임이 있습니다. 다른 닉네임을 입력해주세요.');
+        setNicknameValid(false);
+      }
+    } catch (error) {
+      console.error('닉네임 중복 검사 실패:', error);
+    }
+  };
+
   return (
     <TeamAddContainer>
       <Wrapper>
@@ -138,16 +168,26 @@ function TeamAddModal() {
                 value={teamname}
                 onChange={(e) => setTeamname(e.target.value)}
               />
-              <TAMinput
-                type="text"
-                placeholder="nickname"
-                value={nickname}
-                onChange={(e) => setNickname(e.target.value)}
-              />
+              <div>
+                <TAMinput
+                  type="text"
+                  placeholder="nickname"
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
+                />
+                <button type="button" onClick={handleNicknameCheck}>
+                  중복검사
+                </button>
+              </div>
               select team color
               <ColorPicker onSelectColor={setSelectedColor} />
               <BtnColumn>
-                <ATMbutton>cancel</ATMbutton>
+                <ATMbutton
+                  type="button"
+                  onClick={() => setTeamAddModalIsOpen(false)}
+                >
+                  cancel
+                </ATMbutton>
                 <ATMbutton type="submit">make new calendar!</ATMbutton>
               </BtnColumn>
             </TMForm>

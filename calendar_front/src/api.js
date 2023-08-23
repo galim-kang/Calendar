@@ -21,3 +21,12 @@ export const signupApi = (data) => {
 export const checkIdAvailabilityApi = (data) => {
   return instance.post('/api/v1/users/idcheck/', data);
 };
+
+// 팀 생성 API 함수
+export const createTeamApi = (data) => {
+  return instance.post('/api/v1/teams/', data);
+};
+
+export const nicknameCheckApi = (team_id, nicknames) => {
+  return instance.get(`/api/v1/${nicknames}/${team_id}/`);
+};
