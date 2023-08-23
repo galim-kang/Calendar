@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CommentList from './CommentList';
 import CommentEdit from './CommentEdit';
+import { eventDetailEditApi } from '../../api';
 
 export default function Status({ selectedEvent }) {
   // const [eventPick, setEventPick] = useState({

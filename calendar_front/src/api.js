@@ -27,6 +27,14 @@ export const createTeamApi = (data) => {
   return instance.post('/api/v1/teams/', data);
 };
 
-export const nicknameCheckApi = (team_id, nicknames) => {
-  return instance.get(`/api/v1/${nicknames}/${team_id}/`);
+// 팀 생성 시 닉네임 중복 확인 API 함수
+export const nicknameCheckApi = (data) => {
+  return instance.post(`/api/v1/nicknames/${data.team_id}/`, {
+    nickname: data.nickname,
+  });
+};
+
+// 상세 일정 수정
+export const eventDetailEditApi = (data) => {
+  return instance.put(`/api/v1/schedules/${data.id}/`, data);
 };

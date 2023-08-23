@@ -1,7 +1,8 @@
 import { styled } from 'styled-components';
 import ColorPicker from './ColorPicker';
 import { useState } from 'react';
-import { createTeamApi, nicknameCheckApi } from '../../api';
+import { useForm } from 'react-hook-form';
+import { createTeamApi } from '../../api';
 
 const TeamAddContainer = styled.div`
   width: 100%;
@@ -106,20 +107,29 @@ const ATMbutton = styled.button`
     opacity: 0.5;
   }
 `;
+
 function TeamAddModal() {
-  const [nicknameValid, setNicknameValid] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   const [teamAddModalIsOpen, setTeamAddModalIsOpen] = useState(false);
   const [teamname, setTeamname] = useState('');
-  const [nickname, setNickname] = useState('');
+  // const [nickname, setNickname] = useState('');
   const [selectedColor, setSelectedColor] = useState('#F44E3B');
 
-  // 폼 제출 핸들러
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleFormSubmit = async (data) => {
+    console.log('dkdkdkdk', selectedColor);
+    console.log('Data:', data);
+    if (!data.teamname.trim()) {
+      setTeamAddModalIsOpen(true);
+      return;
+    }
 
     try {
       const response = await createTeamApi({
-        teamname: teamname,
+        teamname: data.teamname,
         color: selectedColor,
       });
       console.log('팀 생성 성공:', response.data);
@@ -127,27 +137,13 @@ function TeamAddModal() {
       console.error('팀 생성 실패:', error);
     }
 
-    // 폼 입력을 콘솔에 기록
     console.log('팀 이름:', teamname);
-    console.log('별명:', nickname);
+    // console.log('별명:', nickname);
     console.log('선택한 색상:', selectedColor);
-    setTeamAddModalIsOpen(false);
-  };
 
-  // 닉네임 중복 검사 핸들러
-  const handleNicknameCheck = async () => {
-    try {
-      const response = await nicknameCheckApi(teamname, nickname);
-      // 중복되지 않으면 상태를 변경
-      if (response.data.available) {
-        setNicknameValid(true);
-      } else {
-        alert('중복된 닉네임이 있습니다. 다른 닉네임을 입력해주세요.');
-        setNicknameValid(false);
-      }
-    } catch (error) {
-      console.error('닉네임 중복 검사 실패:', error);
-    }
+    setTeamAddModalIsOpen(false);
+    setTeamname('');
+    // setNickname('');
   };
 
   return (
@@ -160,25 +156,26 @@ function TeamAddModal() {
       {teamAddModalIsOpen && (
         <TAddModal>
           <TModalWrapper>
-            <TMForm onSubmit={handleSubmit}>
+            <TMForm onSubmit={handleSubmit(handleFormSubmit)}>
               <h2>ADD CALENDAR</h2>
               <TAMinput
                 type="text"
                 placeholder="teamname"
                 value={teamname}
+                {...register('teamname', {
+                  required: '팀 이름을 입력해주세요',
+                })}
                 onChange={(e) => setTeamname(e.target.value)}
               />
-              <div>
+              {errors.teamname && <p>{errors.teamname.message}</p>}
+              {/* <div>
                 <TAMinput
                   type="text"
                   placeholder="nickname"
                   value={nickname}
                   onChange={(e) => setNickname(e.target.value)}
                 />
-                <button type="button" onClick={handleNicknameCheck}>
-                  중복검사
-                </button>
-              </div>
+              </div> */}
               select team color
               <ColorPicker onSelectColor={setSelectedColor} />
               <BtnColumn>
