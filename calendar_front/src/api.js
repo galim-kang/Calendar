@@ -38,3 +38,8 @@ export const nicknameCheckApi = (data) => {
 export const eventDetailEditApi = (data) => {
   return instance.put(`/api/v1/schedules/${data.id}/`, data);
 };
+
+// 일정명 검색
+export const scheduleSearchApi = (data) => {
+  return instance.post(`/api/v1/schedules/search/`, data);
+};
