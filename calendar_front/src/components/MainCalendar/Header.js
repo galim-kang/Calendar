@@ -1,7 +1,8 @@
 import { styled } from 'styled-components';
 import { LuSettings, LuBell } from 'react-icons/lu';
 import SearchInfo from './SearchInfo';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { scheduleSearchApi } from '../../api';
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -12,6 +13,7 @@ const HeaderContainer = styled.div`
   padding: 8px 0;
 `;
 const SearchBox = styled.input`
+  margin-left: 150px;
   padding: 3px 0 3px 10px;
   border: none;
   outline: none;
@@ -19,7 +21,7 @@ const SearchBox = styled.input`
   background-color: white;
   box-shadow: inset 2px 5px 10px rgba(0, 0, 0, 0.1);
   transition: 300ms ease-in-out;
-  width: 30vw;
+  width: 200px;
   &&:focus {
     background-color: rgb(249, 249, 249);
     border: 1px;
@@ -29,8 +31,16 @@ const SearchBox = styled.input`
       3px 3px 8px rgba(0, 0, 70, 0.3);
   }
 `;
-const Blank = styled.div`
-  width: 15vw;
+const Form = styled.form`
+  width: 100%;
+`;
+const Button = styled.button`
+  border: none;
+  outline: none;
+  background-color: white;
+
+  margin-left: 5px;
+  width: 50px;
 `;
 const IconBox = styled.div`
   display: flex;
@@ -43,43 +53,44 @@ const IconBox = styled.div`
 function Header({ data, initialCalendars, initialEvents }) {
   const [searchIsOpen, setSearchIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
 
   const handleInputChange = (event) => {
-    setInputValue(event.target.value);
-    if (event.target.value.length >= 1) {
+    const value = event.target.value;
+    setInputValue(value);
+    if (value.length >= 1) {
       setSearchIsOpen(true);
     } else {
       setSearchIsOpen(false);
     }
   };
+  const handleSearch = (event) => {
+    event.preventDefault(); // 기본 제출 동작 방지
 
-  const matchingData =
-    inputValue.length >= 1
-      ? data.filter((item) =>
-          item.title.toLowerCase().includes(inputValue.toLowerCase()),
-        )
-      : [];
-
-  const handleSearchBoxClick = () => {
     if (inputValue.length >= 1) {
-      setSearchIsOpen(true);
+      scheduleSearchApi({ search: inputValue })
+        .then((data) => setSearchResults(data))
+        .catch((error) => console.error(error));
+    } else {
+      setSearchResults([]);
     }
   };
 
   return (
     <HeaderContainer>
-      <Blank></Blank>
-      <SearchBox
-        type="text"
-        value={inputValue}
-        onChange={handleInputChange}
-        onClick={handleSearchBoxClick}
-        placeholder="search"
-      />
+      <Form onSubmit={handleSearch}>
+        <SearchBox
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          placeholder="search"
+        />
+        <Button type="submit">검색</Button>
+      </Form>
       {searchIsOpen ? (
         <SearchInfo
           onClose={() => setSearchIsOpen(false)}
-          matchingData={matchingData}
+          matchingData={searchResults}
           initialCalendars={initialCalendars}
           initialEvents={initialEvents}
         />
@@ -91,5 +102,4 @@ function Header({ data, initialCalendars, initialEvents }) {
     </HeaderContainer>
   );
 }
-
 export default Header;
